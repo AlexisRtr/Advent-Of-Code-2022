@@ -6,88 +6,7 @@ library(stringr)
 setwd("../Day6")
 getwd()
 
-
-
-
-#### Load data ####
-path0 <- "input0.txt"
-path1 <- "input1.txt"
-path2 <- "input2.txt"
-path3 <- "input3.txt"
-path4 <- "input4.txt"
-
-test(path0)
-
-
-test <- function(path){
-  
-  data <- read.delim(path, header = FALSE)
-  # data_imported <- as.data.frame(data)
-  head(data)
-  list(data)
-  
-  code <- as.character(data$V1[1])
-  code 
-  code <- unlist(strsplit(code, ""))
-  
-  
-  
-  c <- ""
-  already_appeared_char <- c("")
-  print(data)
-  for (index_letter in seq(1,length(code))){
-    cat("\n\n")
-    print(code[index_letter])
-    # if (c == "OUT" & (length(already_appeared_char) == 5)){
-    #   print(index_letter)
-    #   break
-    # }
-    
-    if (length(already_appeared_char) == 5) {
-      # Check if element is already in
-      print("LENGTH == 5")
-      list_size <- "FULL"
-      
-      if (!(code[index_letter] %in% already_appeared_char)) {
-        # Element NOT in the list 
-        print("DONE")
-        print(index_letter-1)
-        break
-      }
-      # else{
-      #   
-      # }
-    }
-    
-    if (!(code[index_letter] %in% already_appeared_char)) {
-      
-      # Case the element is not in the list 
-      if (length(already_appeared_char) == 5) {
-        print("LENGTH == 5 - RETURN THE INDEX")
-        print(index_letter-1)
-        break
-      }
-      print("Element NOT in the list")
-      already_appeared_char <- c(already_appeared_char,code[index_letter])
-      print(already_appeared_char)
-      print("Element added to list already_appeared_char ")
-    }
-    
-    # Case the element to be added is already in the list
-    else{
-      print("if element ALREADY in already_appeared_char CHECK THE LENGTH OF LIST")
-      if (length(already_appeared_char) == 5) {
-        print("LIST FULL - print the element")
-        print(code[index_letter])
-      }
-    }
-    
-    
-    
-  }
-  
-}
-
+# Function to check if there is a repeated vector in a list
 check_if_repeated <- function(liste_letters) {
   already_appeared_char <- c()
   
@@ -111,6 +30,7 @@ check_if_repeated <- function(liste_letters) {
   return(TRUE)
 }
 
+# Check the repeated in a list of nb_char_to_check
 exe <- function(path,nb_char_to_check){
   data <- read.delim(path, header = FALSE)
   code <- as.character(data$V1[1])
@@ -133,11 +53,11 @@ exe <- function(path,nb_char_to_check){
 }
 
 #### Small test  ####
-path0 <- "input0.txt"
-path1 <- "input1.txt"
-path2 <- "input2.txt"
-path3 <- "input3.txt"
-path4 <- "input4.txt"
+path0 <- "input/input0.txt"
+path1 <- "input/input1.txt"
+path2 <- "input/input2.txt"
+path3 <- "input/input3.txt"
+path4 <- "input/input4.txt"
 
 exe(path0,4)
 exe(path1,4)
@@ -146,7 +66,7 @@ exe(path3,4)
 exe(path4,4)
 
 #### Real input  ####
-path_real <- "input_real.txt"
+path_real <- "input/input_real.txt"
 
 exe(path_real,4)
 
