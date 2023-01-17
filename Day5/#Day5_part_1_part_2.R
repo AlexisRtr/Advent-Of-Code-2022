@@ -10,7 +10,7 @@ getwd()
 #### Load data ####
 path <- "input.txt"
 path <- "input_real.txt"
-data <- read.delim(path, header = FALSE)
+data <- read.delim(path, header = FALSE, ) # Modification done manually to add [.] on empty crates
 data_imported <- as.data.frame(data)
 head(data)
 
@@ -25,13 +25,13 @@ names(pyr) <- c("col")
 # Separate one column on X column
 pyr <- pyr %>%
   separate(col, into = c('col1', 'col2','col3','col4','col5','col6','col7','col8','col9'),
-           sep = '\\s* \\s*') 
-pyr[is.na(pyr)] <- ""
+           sep = '\\s* \\s*')
+pyr[pyr == "[.]"] <- "" 
+# rename properly
 names(pyr) <- c("1","2","3","4","5","6","7","8","9")
+# Keep the only interesting information
 pyr <- pyr[1:8,]
-# Some errors happen, corrected manually
-pyr[4,9] <- "[R]"
-pyr[5,9] <- "[M]"
+
 
 
 #### Instruction dataframe ####
@@ -44,7 +44,6 @@ df <- df %>%
   separate(a, into = c('a', 'move_nb','b','from', 'c','to'),
            sep = '\\s* \\s*') %>%
   select(move_nb,from,to)
-
 
 #### Functions ####
 
@@ -83,6 +82,7 @@ index_stack_to_paste <- function(dataset, col_nb) {
 
 #### Function update pyramide for each order ####
 ## Move an item from par.origin to par.destination
+
 update_pyr <- function(data,par.origin, par.destination){
   
   # Select the letter to move
@@ -113,7 +113,9 @@ update_pyr <- function(data,par.origin, par.destination){
   return(data)
 }
 
-#### Execute this update for the whole instruction ####
+
+#### PART 1: Execute this update for the whole instruction ####
+
 exe <- function(data_pyr){
   for (i in seq(1,length(df[,1]))){
     
@@ -141,3 +143,57 @@ df
 
 a <- exe(data_pyr = pyr)
 a
+
+
+#### Part 2 ####
+update_pyr_all <- function(data,par.nb_move,par.origin, par.destination){
+  
+  # Select the letter to move
+  first_index_to_move <- index_stack_to_move(data, par.origin)
+  last_index_to_move <- first_index_to_move + par.nb_move -1 # gET THE OTHER LAST INDEX 
+  
+  # Save/copy to stack
+  temp_stack <- data[first_index_to_move:last_index_to_move,par.origin] # SAVE EVERY CRATES TO SAVE AT ONCE
+  
+  # Remove the stack in the column origin
+  data[first_index_to_move:last_index_to_move,par.origin] <- ""
+  
+  # Paste the temp_stack element in the destination column
+  new_index_to_paste <- index_stack_to_paste(data,par.destination)
+  new_index_to_paste_first <- new_index_to_paste - par.nb_move +1
+  
+  # IF THE SPACE TO PASTE THE TEMP CRATES IS NOT AVAILABLE --> ADD IT
+  # ADD AS MANY LINES AS THERE ARE MISSING
+  while (new_index_to_paste_first < 1) {
+    first_line <- rep("",length(names(data)))
+    # ADD LINES
+    data <- rbind(first_line,data)
+    
+    # UPDATE INDEX
+    new_index_to_paste <- index_stack_to_paste(data,par.destination)
+    new_index_to_paste_first <- new_index_to_paste - par.nb_move +1
+  }
+  
+  data[new_index_to_paste_first:new_index_to_paste,par.destination] <- temp_stack
+  
+  return(data)
+}
+
+update_pyr_all(data = pyr,par.nb_move = 8,par.origin = 7,par.destination = 4)
+
+exe_part2 <- function(data_pyr){
+  for (i in seq(1,length(df[,1]))){
+    
+    ## Set the instruction computationally
+    nb_move <- as.numeric(df[i,1])
+    origin <- as.numeric(df[i,2])
+    destination <- as.numeric(df[i,3])
+    
+    # UPDATE PYR ONLY ONCE SINCE WE MOVE ALL CRATES AT ONCE
+    data_pyr <- update_pyr_all(data = data_pyr,par.nb_move = nb_move, par.origin = origin, par.destination = destination)
+  }
+  return(data_pyr)
+}
+
+
+exe_part2(pyr)
